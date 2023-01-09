@@ -1,5 +1,10 @@
-FROM golang:1.15.15 as build
+FROM --platform=${BUILDPLATFORM:-linux/amd64} golang:1.15.15 as build
 ENV GO111MODULE=on
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -16,9 +21,12 @@ COPY Makefile Makefile
 
 # As (generated) proto/service.pb.go is _also_ committed, void the need to install protoc / protoc-gen-go plugin
 RUN touch proto/service.pb.go
-RUN make bin/kiam-linux-amd64
+RUN ARCH=$TARGETARCH make bin/kiam-linux-$TARGETARCH
 
 FROM alpine:3.11
+
+ARG TARGETARCH
+
 RUN apk --no-cache add iptables
-COPY --from=build /workspace/bin/kiam-linux-amd64 /kiam
+COPY --from=build /workspace/bin/kiam-linux-$TARGETARCH /kiam
 CMD []
