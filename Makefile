@@ -1,5 +1,5 @@
 NAME?=kiam
-ARCH=amd64
+ARCH?=amd64
 BIN = bin/kiam
 BIN_LINUX = $(BIN)-linux-$(ARCH)
 BIN_DARWIN = $(BIN)-darwin-$(ARCH)
